@@ -1,52 +1,53 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework">
-    
-    <SolidColorBrush x:Key="ThemeWindowBackground" Color="#1E1E1E" />
+
+    <!-- Revit Dark Theme Colors -->
+    <SolidColorBrush x:Key="ThemeWindowBackground" Color="#2C3E50" />
     <SolidColorBrush x:Key="ThemeWindowForeground" Color="#D4D4D4" />
-    
-    <SolidColorBrush x:Key="ThemeEditorBackground" Color="#141414" />
+
+    <SolidColorBrush x:Key="ThemeEditorBackground" Color="#1F2D3D" />
     <SolidColorBrush x:Key="ThemeEditorForeground" Color="#DCDCDC" />
-    <SolidColorBrush x:Key="ThemeEditorSelection" Color="#1F3B5B" />
-    <SolidColorBrush x:Key="ThemeEditorSelectionBorder" Color="#0063B1" />
+    <SolidColorBrush x:Key="ThemeEditorSelection" Color="#1F4F6F" />
+    <SolidColorBrush x:Key="ThemeEditorSelectionBorder" Color="#0078D4" />
 
-    
-    <SolidColorBrush x:Key="ThemeRibbonBackground" Color="#141414" />
+
+    <SolidColorBrush x:Key="ThemeRibbonBackground" Color="#2C3E50" />
     <SolidColorBrush x:Key="ThemeRibbonForeground" Color="#D4D4D4" />
-    <SolidColorBrush x:Key="ThemeRibbonBorder" Color="#2D2D30" />
-    
-    <SolidColorBrush x:Key="ThemePanelBackground" Color="#1E1E1E" />
-    <SolidColorBrush x:Key="ThemePanelBorder" Color="#3E3E42" />
-    
-    <SolidColorBrush x:Key="ThemeConsoleBackground" Color="#1E1E1E" />
-    <SolidColorBrush x:Key="ThemeConsoleForeground" Color="#D4D4D4" />
-    
-    <SolidColorBrush x:Key="ThemeGridSplitter" Color="#3E3E42" />
-    <SolidColorBrush x:Key="ThemeGridSplitterHover" Color="#007ACC" />
-    
-    <SolidColorBrush x:Key="ThemeLineNumbersForeground" Color="#7A7A7A" />
-    <SolidColorBrush x:Key="ThemeLineNumbersBackground" Color="#141414" />
+    <SolidColorBrush x:Key="ThemeRibbonBorder" Color="#3D4F61" />
 
-    
+    <SolidColorBrush x:Key="ThemePanelBackground" Color="#2C3E50" />
+    <SolidColorBrush x:Key="ThemePanelBorder" Color="#3D4F61" />
+
+    <SolidColorBrush x:Key="ThemeConsoleBackground" Color="#1F2D3D" />
+    <SolidColorBrush x:Key="ThemeConsoleForeground" Color="#D4D4D4" />
+
+    <SolidColorBrush x:Key="ThemeGridSplitter" Color="#3D4F61" />
+    <SolidColorBrush x:Key="ThemeGridSplitterHover" Color="#0078D4" />
+
+    <SolidColorBrush x:Key="ThemeLineNumbersForeground" Color="#7A8A9A" />
+    <SolidColorBrush x:Key="ThemeLineNumbersBackground" Color="#1F2D3D" />
+
+
     <SolidColorBrush x:Key="ThemeCaret" Color="#D4D4D4" />
 
-    <SolidColorBrush x:Key="ThemeTitleBarBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="ThemeTitleBarBackground" Color="#2C3E50" />
     <SolidColorBrush x:Key="ThemeTitleBarForeground" Color="#D4D4D4" />
-    <SolidColorBrush x:Key="ThemeTitleBarBorder" Color="#2D2D30" />
-    <SolidColorBrush x:Key="ThemeTitleBarButtonHover" Color="#3E3E42" />
-    <SolidColorBrush x:Key="ThemeTitleBarButtonPressed" Color="#505050" />
+    <SolidColorBrush x:Key="ThemeTitleBarBorder" Color="#3D4F61" />
+    <SolidColorBrush x:Key="ThemeTitleBarButtonHover" Color="#3D4F61" />
+    <SolidColorBrush x:Key="ThemeTitleBarButtonPressed" Color="#4D5F71" />
     <SolidColorBrush x:Key="ThemeTitleBarCloseHover" Color="#C42B1C" />
     <SolidColorBrush x:Key="ThemeTitleBarClosePressed" Color="#A31B10" />
     <SolidColorBrush x:Key="ThemeTitleBarCloseForeground" Color="#FFFFFF" />
 
-    <SolidColorBrush x:Key="ThemeScrollBarBackground" Color="#2D2D30" />
-    <SolidColorBrush x:Key="ThemeScrollBarThumb" Color="#3E3E42" />
-    <SolidColorBrush x:Key="ThemeScrollBarThumbHover" Color="#505050" />
-    <SolidColorBrush x:Key="ThemeScrollBarThumbPressed" Color="#606060" />
-    
+    <SolidColorBrush x:Key="ThemeScrollBarBackground" Color="#2C3E50" />
+    <SolidColorBrush x:Key="ThemeScrollBarThumb" Color="#4D5F71" />
+    <SolidColorBrush x:Key="ThemeScrollBarThumbHover" Color="#5D6F81" />
+    <SolidColorBrush x:Key="ThemeScrollBarThumbPressed" Color="#6D7F91" />
+
     <Color x:Key="ThemeHyperlink">#4EC9B0</Color>
-    <Color x:Key="ThemeHyperlinkHover">#007ACC</Color>
-    
+    <Color x:Key="ThemeHyperlinkHover">#0078D4</Color>
+
     <Style TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{StaticResource ThemeWindowForeground}" />
     </Style>
@@ -165,6 +166,7 @@
                         <Track x:Name="PART_Track"
                                Grid.Row="1"
                                Grid.Column="1"
+                               IsDirectionReversed="True"
                                Maximum="{TemplateBinding Maximum}"
                                Minimum="{TemplateBinding Minimum}"
                                Value="{TemplateBinding Value}"
@@ -209,6 +211,7 @@
                             <Setter TargetName="PageDownButton" Property="Command" Value="{x:Static ScrollBar.PageRightCommand}" />
                             <Setter TargetName="PART_Track" Property="Grid.Row" Value="1" />
                             <Setter TargetName="PART_Track" Property="Grid.Column" Value="1" />
+                            <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -230,7 +233,344 @@
                 <Setter Property="BorderBrush" Value="{StaticResource ThemeScrollBarThumbPressed}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-    
-</ResourceDictionary>
+         </Style>
+
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{StaticResource ThemeWindowForeground}" />
+            <Setter Property="Background" Value="#1F2D3D" />
+            <Setter Property="BorderBrush" Value="#5A7188" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="4,0,0,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent" VerticalAlignment="Center">
+                            <BulletDecorator.Bullet>
+                                <Border x:Name="CheckBoxBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Width="14"
+                                        Height="14"
+                                        CornerRadius="2">
+                                    <TextBlock x:Name="CheckMark"
+                                               Text="✓"
+                                               Foreground="#FFFFFF"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Visibility="Collapsed" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#2C3E50" />
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#6A8198" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#1F4F6F" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#0078D4" />
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#0078D4" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.56" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                <!-- RibbonButton Style for Dark Theme with Full Template Override -->
+                <Style TargetType="{x:Type RibbonButton}">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="Foreground" Value="{StaticResource ThemeRibbonForeground}" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Padding" Value="2,0" />
+                    <Setter Property="MinHeight" Value="22" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type RibbonButton}">
+                                <Border x:Name="OuterBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="2"
+                                        Padding="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="True">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Large Image for LargeImageSource (shown by default when set) -->
+                                            <Image x:Name="LargeImage"
+                                                   Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Grid.ColumnSpan="2"
+                                                   Source="{TemplateBinding LargeImageSource}"
+                                                   Width="32"
+                                                   Height="32"
+                                                   Stretch="Uniform"
+                                                   Margin="0"
+                                                   HorizontalAlignment="Center"
+                                                   Visibility="Visible" />
+
+                                            <!-- Small Image for SmallImageSource -->
+                                            <Image x:Name="SmallImage"
+                                                   Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Source="{TemplateBinding SmallImageSource}"
+                                                   Width="16"
+                                                   Height="16"
+                                                   Stretch="Uniform"
+                                                   Margin="0,0,2,0"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="Collapsed" />
+
+                                            <!-- Label -->
+                                            <TextBlock x:Name="LabelText"
+                                                       Grid.Row="1"
+                                                       Grid.Column="0"
+                                                       Grid.ColumnSpan="2"
+                                                       Text="{TemplateBinding Label}"
+                                                       Foreground="{TemplateBinding Foreground}"
+                                                   FontSize="11"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   Margin="0,0,0,0" />
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <!-- When LargeImageSource IS null, show small image with horizontal layout -->
+                                    <Trigger Property="LargeImageSource" Value="{x:Null}">
+                                        <Setter TargetName="LargeImage" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="SmallImage" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="SmallImage" Property="Grid.Row" Value="0" />
+                                        <Setter TargetName="SmallImage" Property="Grid.Column" Value="0" />
+                                        <Setter TargetName="LabelText" Property="Grid.Row" Value="0" />
+                                        <Setter TargetName="LabelText" Property="Grid.Column" Value="1" />
+                                        <Setter TargetName="LabelText" Property="Margin" Value="0,0,0,0" />
+                                        <Setter TargetName="LabelText" Property="VerticalAlignment" Value="Center" />
+                                        <Setter TargetName="LabelText" Property="HorizontalAlignment" Value="Left" />
+                                    </Trigger>
+
+                                    <!-- Hover state -->
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#3D4F61" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#4D5F71" />
+                                    </Trigger>
+                                    <!-- Pressed state -->
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#2C3E50" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#3D4F61" />
+                                    </Trigger>
+                                    <!-- Disabled state -->
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.56" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
+                <!-- RibbonToggleButton Style for Dark Theme -->
+                <Style TargetType="{x:Type RibbonToggleButton}">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="Foreground" Value="{StaticResource ThemeRibbonForeground}" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Padding" Value="2,0" />
+                    <Setter Property="MinHeight" Value="22" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type RibbonToggleButton}">
+                                <Border x:Name="OuterBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="2"
+                                        Padding="{TemplateBinding Padding}"
+                                        SnapsToDevicePixels="True">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <!-- Image -->
+                                        <Image x:Name="SmallImage"
+                                               Source="{TemplateBinding SmallImageSource}"
+                                               Width="16"
+                                               Height="16"
+                                               Stretch="Uniform"
+                                               Margin="0,0,2,0"
+                                               VerticalAlignment="Center" />
+                                        <!-- Label -->
+                                        <TextBlock x:Name="LabelText"
+                                                   Text="{TemplateBinding Label}"
+                                                   Foreground="{TemplateBinding Foreground}"
+                                                   FontSize="11"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   Margin="0" />
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <!-- Hover state -->
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#3D4F61" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#4D5F71" />
+                                    </Trigger>
+                                    <!-- Pressed state -->
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#2C3E50" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#3D4F61" />
+                                    </Trigger>
+                                    <!-- Checked state -->
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#1F4F6F" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#0078D4" />
+                                    </Trigger>
+                                    <!-- Disabled state -->
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.56" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
+                                    <!-- Custom RibbonCheckBox Style for Dark Theme -->
+                                    <Style TargetType="{x:Type RibbonCheckBox}">
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                <Setter Property="Foreground" Value="{StaticResource ThemeRibbonForeground}" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Padding" Value="2,0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type RibbonCheckBox}">
+                                <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
+                                    <Border x:Name="OuterBorder"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="2">
+                                        <Grid Margin="{TemplateBinding Padding}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Custom Dark Checkbox -->
+                                            <Border x:Name="CheckBoxBorder"
+                                                    Grid.Column="0"
+                                                    Background="#1F2D3D"
+                                                    BorderBrush="#5A7188"
+                                                    BorderThickness="1"
+                                                    Width="13"
+                                                    Height="13"
+                                                    Margin="0,0,0,0"
+                                                    CornerRadius="2"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="Collapsed">
+                                                <Path x:Name="CheckMark"
+                                                      Data="M 0,3 L 2,5 L 5,0"
+                                                      Stroke="#FFFFFF"
+                                                      StrokeThickness="2"
+                                                      Stretch="Uniform"
+                                                      Width="8"
+                                                      Height="8"
+                                                      Visibility="Collapsed"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" />
+                                            </Border>
+
+                                            <!-- Image (shown when SmallImageSource is set) -->
+                                            <Border x:Name="ImageBorder"
+                                                    Grid.Column="0"
+                                                    BorderThickness="2"
+                                                    BorderBrush="Transparent"
+                                                    CornerRadius="2"
+                                                    Padding="0"
+                                                    Margin="0,0,0,0"
+                                                    VerticalAlignment="Center">
+                                                <Image x:Name="SmallImage"
+                                                       Source="{TemplateBinding SmallImageSource}"
+                                                       Width="16"
+                                                       Height="16"
+                                                       Stretch="Uniform" />
+                                            </Border>
+
+                                            <!-- Label -->
+                                            <TextBlock x:Name="LabelText"
+                                                       Grid.Column="1"
+                                                       Text="{TemplateBinding Label}"
+                                                       Foreground="{TemplateBinding Foreground}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap"
+                                                       Margin="0,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <!-- Show checkbox if no image is provided, otherwise show image -->
+                                    <Trigger Property="SmallImageSource" Value="{x:Null}">
+                                        <Setter TargetName="CheckBoxBorder" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="ImageBorder" Property="Visibility" Value="Collapsed" />
+                                    </Trigger>
+
+                                    <!-- Hover state -->
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#3D4F61" />
+                                        <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#4D5F71" />
+                                        <Setter TargetName="CheckBoxBorder" Property="Background" Value="#2C3E50" />
+                                        <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#6A8198" />
+                                    </Trigger>
+
+                                    <!-- Pressed state -->
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="OuterBorder" Property="Background" Value="#2C3E50" />
+                                        <Setter TargetName="CheckBoxBorder" Property="Background" Value="#1F4F6F" />
+                                    </Trigger>
+
+                                    <!-- Checked state -->
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="CheckBoxBorder" Property="Background" Value="#0078D4" />
+                                        <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#0078D4" />
+                                        <Setter TargetName="ImageBorder" Property="BorderBrush" Value="#0078D4" />
+                                        <Setter TargetName="ImageBorder" Property="Background" Value="#1F4F6F" />
+                                    </Trigger>
+
+                                    <!-- Disabled state -->
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.56" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
+                </ResourceDictionary>
 

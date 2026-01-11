@@ -92,6 +92,43 @@ namespace RevitPythonShell.Helpers
             CurrentTheme = theme;
         }
 
+        public void ApplyRevitThemePreference()
+        {
+            try
+            {
+                var uiThemeManagerType = Type.GetType("Autodesk.Revit.UI.UIThemeManager, RevitAPIUI");
+                if (uiThemeManagerType == null)
+                {
+                    return;
+                }
+
+                var currentThemeProperty = uiThemeManagerType.GetProperty("CurrentTheme", BindingFlags.Public | BindingFlags.Static);
+                if (currentThemeProperty == null)
+                {
+                    return;
+                }
+
+                var currentThemeValue = currentThemeProperty.GetValue(null);
+                if (currentThemeValue == null)
+                {
+                    return;
+                }
+
+                var themeName = currentThemeValue.ToString();
+                if (string.Equals(themeName, "Dark", StringComparison.OrdinalIgnoreCase))
+                {
+                    SetTheme(Theme.Dark);
+                }
+                else if (string.Equals(themeName, "Light", StringComparison.OrdinalIgnoreCase))
+                {
+                    SetTheme(Theme.Light);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public void ToggleTheme()
         {
             SetTheme(CurrentTheme == Theme.Light ? Theme.Dark : Theme.Light);
@@ -132,8 +169,8 @@ namespace RevitPythonShell.Helpers
                 : "RevitPythonShell.Resources.Python.xshd";
 
             string highlightingName = CurrentTheme == Theme.Dark
-                ? "Python-Dark Highlighting"
-                : "Python Highlighting";
+                ? "Python-Dark Highlighting v4"
+                : "Python Highlighting v4";
 
             IHighlightingDefinition existingHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
             if (existingHighlighting != null)

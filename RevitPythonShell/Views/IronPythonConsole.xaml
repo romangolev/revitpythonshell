@@ -25,8 +25,9 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/RevitPythonShell;component/Themes/DarkTheme.xaml" />
+                <!-- <ResourceDictionary Source="/RevitPythonShell;component/Themes/DarkTheme.xaml" /> -->
 
+                <ResourceDictionary Source="/RevitPythonShell;component/Themes/LightTheme.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 
 			<Style TargetType="{x:Type Ribbon}">
@@ -83,6 +84,7 @@
 				<Setter Property="Background" Value="{DynamicResource ThemeRibbonBackground}" />
 				<Setter Property="Foreground" Value="{DynamicResource ThemeRibbonForeground}" />
 				<Setter Property="BorderBrush" Value="{DynamicResource ThemeRibbonBorder}" />
+				<Setter Property="Height" Value="78" />
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="{x:Type RibbonGroup}">
@@ -163,9 +165,9 @@
 		<DockPanel Grid.Column="0" Grid.Row="1" Background="{DynamicResource ThemeRibbonBackground}">
 			<Ribbon Name="mainRibbon"
 					Margin="0,-22,0,0" 
-                    KeyboardNavigation.TabIndex="0"
-                    ContextMenu="{x:Null}"
-                    AllowDrop="False">
+					KeyboardNavigation.TabIndex="0"
+					ContextMenu="{x:Null}"
+					AllowDrop="False">
 				<Ribbon.Resources>
 					<Style TargetType="{x:Type Image}">
 						<Style.Triggers>
@@ -252,14 +254,6 @@
                                       Click="runClick"
                                       ToolTip="(F5) Run Script. Results will be displayed in the IronPython prompt." />
 					</RibbonGroup>
-					<RibbonGroup Header="Theme">
-						<RibbonButton Name="toggleThemeButton"
-                                      Label="Toggle&#10;Theme"
-
-                                      SnapsToDevicePixels="True"
-                                      Click="toggleThemeClick"
-                                      ToolTip="Toggle between Light and Dark theme" />
-					</RibbonGroup>
 				</RibbonTab>
 			</Ribbon>
 			<!-- <ToolBar DockPanel.Dock="Top"> -->
@@ -294,7 +288,7 @@
 		<Grid Grid.Row="4" MinHeight="20" Background="{DynamicResource ThemeConsoleBackground}">
 			<console:IronPythonConsoleControl Name="consoleControl" />
 		</Grid>
-		<Border Grid.Column="0" Grid.Row="0" Background="{DynamicResource ThemeTitleBarBackground}" BorderBrush="{DynamicResource ThemeTitleBarBorder}" BorderThickness="0,0,0,1">
+		<Border Grid.Column="0" Grid.Row="0" Panel.ZIndex="1" Background="{DynamicResource ThemeTitleBarBackground}" BorderBrush="{DynamicResource ThemeTitleBarBorder}" BorderThickness="0,0,0,1">
 			<Grid MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto" />

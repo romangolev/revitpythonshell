@@ -36,6 +36,25 @@ namespace PythonConsoleControl
             get { return host.Console; }
         }
 
+        /// <summary>
+        /// Sets the foreground color for the console text.
+        /// </summary>
+        public void SetForeground(Brush foreground)
+        {
+            textEditor.Foreground = foreground;
+            textEditor.TextArea.Foreground = foreground;
+            // Force the TextView to use the new foreground
+            textEditor.TextArea.TextView.LinkTextForegroundBrush = foreground;
+        }
+
+        /// <summary>
+        /// Sets the background color for the console.
+        /// </summary>
+        public void SetBackground(Brush background)
+        {
+            textEditor.Background = background;
+        }
+
         public void Dispose()
         {
             host.Dispose();

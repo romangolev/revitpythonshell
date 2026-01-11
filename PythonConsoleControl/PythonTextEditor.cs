@@ -323,7 +323,7 @@ namespace PythonConsoleControl
         /// </summary>
         internal void BackgroundShowCompletionWindow() //ICompletionItemProvider
         {
-			// provide AvalonEdit with the data:
+            // provide AvalonEdit with the data:
             string itemForCompletion = "";
             textArea.Dispatcher.Invoke(new Action(delegate()
             {
@@ -368,7 +368,7 @@ namespace PythonConsoleControl
                     MessageBox.Show(exception.ToString(), "Error");
                 }
 
-            }));            
+            }));
         }
 
         internal void BackgroundUpdateCompletionDescription()
@@ -384,7 +384,7 @@ namespace PythonConsoleControl
                     MessageBox.Show(exception.ToString(), "Error");
                 }
 
-            }));            
+            }));
         }
 
         public void RequestCompletioninsertion(TextCompositionEventArgs e)
@@ -396,6 +396,3 @@ namespace PythonConsoleControl
 
     }
 }
-
-    
-   

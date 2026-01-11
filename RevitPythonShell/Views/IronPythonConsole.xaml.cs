@@ -28,6 +28,7 @@ namespace RevitPythonShell.Views
 
             var settings = App.GetSettings();
             ThemeManager.Instance.LoadThemeFromSettings(settings);
+            ThemeManager.Instance.ApplyRevitThemePreference();
             ApplyTheme();
             ThemeManager.Instance.ThemeChanged += ThemeManager_ThemeChanged;
 

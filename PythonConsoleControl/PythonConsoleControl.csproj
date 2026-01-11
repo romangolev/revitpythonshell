@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
     <PublishSingleFile>true</PublishSingleFile>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <EnableDefaultItems>false</EnableDefaultItems>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
@@ -16,7 +16,7 @@
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="IronPython" Version="3.4.1" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="IronPython">
       <HintPath>..\RequiredLibraries\IronPython.dll</HintPath>
     </Reference>
@@ -32,8 +32,6 @@
     <Reference Include="Microsoft.Scripting.Metadata">
       <HintPath>..\RequiredLibraries\Microsoft.Scripting.Metadata.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -51,9 +49,7 @@
     <Compile Include="PythonConsoleCompletionDataProvider.cs" />
     <Compile Include="PythonConsole.cs" />
     <Compile Include="PythonConsoleCompletionWindow.cs" />
-    <Compile Include="PythonConsoleControl.xaml.cs">
-      <DependentUpon>PythonConsoleControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="PythonConsoleControl.xaml.cs" />
     <Compile Include="PythonConsoleHighlightingColorizer.cs" />
     <Compile Include="PythonConsoleHost.cs" />
     <Compile Include="PythonConsolePad.cs" />
