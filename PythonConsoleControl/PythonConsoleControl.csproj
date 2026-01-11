@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
     <PublishSingleFile>true</PublishSingleFile>
@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Python.xshd" />
+    <EmbeddedResource Include="Resources\Python-Dark.xshd" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Configurations>Debug;Release</Configurations>
 		<RuntimeIdentifiers>win</RuntimeIdentifiers>
@@ -284,6 +284,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="Helpers\ProcessManager.cs" />
+		<Compile Include="Helpers\ThemeManager.cs" />
 		<Compile Include="RevitCommands\CommandLoaderBase.cs" />
 		<Compile Include="Views\CompletionToolTip.cs" />
 		<Compile Include="RevitCommands\ConfigureCommand.cs" />
@@ -331,8 +332,8 @@
 		<Resource Include="Resources\Theme\Save.png" />
 		<Resource Include="Resources\Theme\Undo.png" />
 		<Resource Include="Resources\Theme\WordWrap.png" />
-		<EmbeddedResource Include="Resources\Console-16.png" />
-		<EmbeddedResource Include="Resources\Console-32.png" />
+		<Resource Include="Resources\Console-16.png" />
+		<Resource Include="Resources\Console-32.png" />
 		<EmbeddedResource Include="Resources\Deployment-16.png" />
 		<EmbeddedResource Include="Resources\Deployment-32.png" />
 		<EmbeddedResource Include="Resources\Python-16.png" />
@@ -358,6 +359,9 @@
 			<SubType>Designer</SubType>
 		</None>
 		<EmbeddedResource Include="Resources\Python.xshd" />
+		<EmbeddedResource Include="Resources\Python-Dark.xshd" />
+		<Resource Include="Themes\LightTheme.xaml" />
+		<Resource Include="Themes\DarkTheme.xaml" />
 	</ItemGroup>
 	<ItemGroup>
 		<Page Include="Views\IronPythonConsole.xaml">
@@ -416,14 +420,15 @@
 		<PropertyGroup>
 			<RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
 			<AddinDir>$(RootDir)$(AssemblyName)\</AddinDir>
+			<RevitAddinsDir>$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\</RevitAddinsDir>
 		</PropertyGroup>
 
 		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)" />
 		<Copy SourceFiles="@(ConfigItem)" DestinationFolder="$(AddinDir)" />
 		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)" />
 
-		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))" />
-		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(AssemblyName)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))" />
-		<Copy SourceFiles="@(ConfigItem)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(AssemblyName)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))" />
+		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RevitAddinsDir)" Condition="$(Configuration.Contains('Debug'))" />
+		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(RevitAddinsDir)$(AssemblyName)\" Condition="$(Configuration.Contains('Debug'))" />
+		<Copy SourceFiles="@(ConfigItem)" DestinationFolder="$(RevitAddinsDir)$(AssemblyName)\" Condition="$(Configuration.Contains('Debug'))" />
 	</Target>
 </Project>

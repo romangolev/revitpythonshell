@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Xml;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Rendering;
 
@@ -14,7 +17,12 @@ namespace PythonConsoleControl
     /// </summary>
     public partial class IronPythonConsoleControl : UserControl
     {
-        PythonConsolePad _pad;                
+        private const string LightHighlightingName = "Python Console Highlighting";
+        private const string DarkHighlightingName = "Python Console Dark Highlighting";
+        private const string LightHighlightingResource = "PythonConsoleControl.Resources.Python.xshd";
+        private const string DarkHighlightingResource = "PythonConsoleControl.Resources.Python-Dark.xshd";
+
+        private readonly PythonConsolePad _pad;
 
         /// <summary>
         /// Perform the action on an already instantiated PythonConsoleHost.
@@ -29,26 +37,76 @@ namespace PythonConsoleControl
             InitializeComponent();
             _pad = new PythonConsolePad();
             Grid.Children.Add(_pad.Control);
-            // Load our custom highlighting definition
-            IHighlightingDefinition pythonHighlighting;
-            using (Stream s = typeof(IronPythonConsoleControl).Assembly.GetManifestResourceStream("PythonConsoleControl.Resources.Python.xshd"))
+            ApplyTheme(false);
+        }
+
+        public void ApplyTheme(bool useDarkTheme)
+        {
+            ApplyThemeResources();
+            var highlightingDefinition = GetHighlightingDefinition(
+                useDarkTheme ? DarkHighlightingResource : LightHighlightingResource,
+                useDarkTheme ? DarkHighlightingName : LightHighlightingName);
+            ApplyHighlighting(highlightingDefinition);
+        }
+
+        private void ApplyThemeResources()
+        {
+            TextEditor editor = _pad.Control;
+            Brush backgroundBrush = TryFindResource("ThemeConsoleBackground") as Brush;
+            Brush foregroundBrush = TryFindResource("ThemeConsoleForeground") as Brush;
+
+            if (backgroundBrush != null)
             {
-                if (s == null)
-                    throw new InvalidOperationException("Could not find embedded resource");
-                using (XmlReader reader = new XmlTextReader(s))
+                editor.Background = backgroundBrush;
+            }
+
+            if (foregroundBrush != null)
+            {
+                editor.Foreground = foregroundBrush;
+            }
+        }
+
+        private static IHighlightingDefinition GetHighlightingDefinition(string resourceName, string highlightingName)
+        {
+            IHighlightingDefinition existingHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
+            if (existingHighlighting != null)
+            {
+                return existingHighlighting;
+            }
+
+            using (Stream resourceStream = typeof(IronPythonConsoleControl).Assembly.GetManifestResourceStream(resourceName))
+            {
+                if (resourceStream == null)
                 {
-                    pythonHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.
-                        HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                    throw new InvalidOperationException($"Could not find embedded resource: {resourceName}");
+                }
+
+                using (XmlReader xmlReader = new XmlTextReader(resourceStream))
+                {
+                    var highlightingDefinition = ICSharpCode.AvalonEdit.Highlighting.Xshd.
+                        HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
+                    HighlightingManager.Instance.RegisterHighlighting(highlightingName, new string[] { ".py" }, highlightingDefinition);
+                    return highlightingDefinition;
                 }
             }
-            // and register it in the HighlightingManager
-            HighlightingManager.Instance.RegisterHighlighting("Python Highlighting", new string[] { ".cool" }, pythonHighlighting);
-            _pad.Control.SyntaxHighlighting = pythonHighlighting;
-            IList<IVisualLineTransformer> transformers = _pad.Control.TextArea.TextView.LineTransformers;
-            for (int i = 0; i < transformers.Count; ++i)
+        }
+
+        private void ApplyHighlighting(IHighlightingDefinition highlightingDefinition)
+        {
+            TextEditor editor = _pad.Control;
+            editor.SyntaxHighlighting = highlightingDefinition;
+
+            IList<IVisualLineTransformer> lineTransformers = editor.TextArea.TextView.LineTransformers;
+            for (int transformerIndex = 0; transformerIndex < lineTransformers.Count; ++transformerIndex)
             {
-                if (transformers[i] is HighlightingColorizer) transformers[i] = new PythonConsoleHighlightingColorizer(pythonHighlighting, _pad.Control.Document);
+                if (lineTransformers[transformerIndex] is HighlightingColorizer)
+                {
+                    lineTransformers[transformerIndex] = new PythonConsoleHighlightingColorizer(highlightingDefinition, editor.Document);
+                    return;
+                }
             }
+
+            lineTransformers.Add(new PythonConsoleHighlightingColorizer(highlightingDefinition, editor.Document));
         }
 
         public PythonConsolePad Pad

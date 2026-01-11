@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls.Ribbon;
 using System.Windows.Input;
-using System.Xml;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Highlighting;
 using Microsoft.Win32;
+using RevitPythonShell.Helpers;
 
 namespace RevitPythonShell.Views
 {
@@ -25,28 +24,21 @@ namespace RevitPythonShell.Views
         {
             Initialized += new EventHandler(MainWindow_Initialized);
 
-            IHighlightingDefinition pythonHighlighting;
-            using (Stream s = typeof(IronPythonConsole).Assembly.GetManifestResourceStream("RevitPythonShell.Resources.Python.xshd"))
-            {
-                if (s == null)
-                    throw new InvalidOperationException("Could not find embedded resource");
-                using (XmlReader reader = new XmlTextReader(s))
-                {
-                    pythonHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.
-                        HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                }
-            }
-            // and register it in the HighlightingManager
-            HighlightingManager.Instance.RegisterHighlighting("Python Highlighting", new string[] { ".cool" }, pythonHighlighting);
-
             InitializeComponent();
 
-            textEditor.SyntaxHighlighting = pythonHighlighting;
+            var settings = App.GetSettings();
+            ThemeManager.Instance.LoadThemeFromSettings(settings);
+            ApplyTheme();
+            ThemeManager.Instance.ThemeChanged += ThemeManager_ThemeChanged;
+
             textEditor.PreviewKeyDown += new KeyEventHandler(textEditor_PreviewKeyDown);
             consoleOptionsProvider = new ConsoleOptions(consoleControl.Pad);
 
+            StateChanged += IronPythonConsole_StateChanged;
+
             // get application version and show in title
             Title = String.Format("RevitPythonShell | {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            UpdateMaximizeButton();
         }
 
         private void MainWindow_Initialized(object sender, EventArgs e)
@@ -104,7 +96,13 @@ namespace RevitPythonShell.Views
             RunStatements();
         }
 
+        private void toggleThemeClick(object sender, RoutedEventArgs e)
+        {
+            ThemeManager.Instance.ToggleTheme();
+        }
+ 
         private void textEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+ 
         {
             if (e.Key == Key.F5) RunStatements();
             if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control) SaveFile();
@@ -114,6 +112,56 @@ namespace RevitPythonShell.Views
             if (e.Key == Key.F4 && Keyboard.Modifiers == ModifierKeys.Control) Close();
             
         }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ToggleMaximize();
+                return;
+            }
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleMaximize();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void IronPythonConsole_StateChanged(object sender, EventArgs e)
+        {
+            UpdateMaximizeButton();
+        }
+
+        private void ToggleMaximize()
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        }
+
+        private void UpdateMaximizeButton()
+        {
+            if (maximizeButton == null)
+            {
+                return;
+            }
+
+            maximizeButton.Content = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+        }
+
 
         private void RunStatements()
         {
@@ -125,7 +173,34 @@ namespace RevitPythonShell.Views
             consoleControl.Pad.Console.RunStatements(statementsToRun);
         }
 
+        private void ThemeManager_ThemeChanged(object sender, EventArgs e)
+        {
+            ApplyTheme();
+            SaveThemePreference();
+        }
+
+        private void ApplyTheme()
+        {
+            ThemeManager.Instance.ApplyThemeToWindow(this);
+            textEditor.SyntaxHighlighting = ThemeManager.Instance.GetHighlightingDefinition(Assembly.GetExecutingAssembly());
+            consoleControl.ApplyTheme(ThemeManager.Instance.CurrentTheme == Theme.Dark);
+        }
+
+        private void SaveThemePreference()
+        {
+            var settings = App.GetSettings();
+            ThemeManager.Instance.SaveThemeToSettings(settings);
+            settings.Save(GetSettingsFilePath());
+        }
+
+        private static string GetSettingsFilePath()
+        {
+            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+            return Path.Combine(assemblyFolder, "RevitPythonShell.xml");
+        }
+ 
         // Clear the contents on first click inside the editor
+
         private void textEditor_GotFocus(object sender, RoutedEventArgs e)
         {
             if (this.currentFileName == null)
