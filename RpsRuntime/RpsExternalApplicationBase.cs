@@ -40,7 +40,27 @@ namespace RpsRuntime
             var addinName = this.GetType().Name; // subclass provides the name
             var addinAssembly = this.GetType().Assembly;
 
-            var addinXml = XDocument.Load(addinAssembly.GetManifestResourceStream(addinName + ".xml"));
+            // Try to load XML from embedded resource first, then from file
+            XDocument addinXml;
+            var xmlResourceStream = addinAssembly.GetManifestResourceStream(addinName + ".xml");
+            if (xmlResourceStream != null)
+            {
+                addinXml = XDocument.Load(xmlResourceStream);
+            }
+            else
+            {
+                // Fall back to loading from file in same directory as assembly
+                var assemblyDir = Path.GetDirectoryName(addinAssembly.Location);
+                var xmlPath = Path.Combine(assemblyDir, addinName + ".xml");
+                if (File.Exists(xmlPath))
+                {
+                    addinXml = XDocument.Load(xmlPath);
+                }
+                else
+                {
+                    throw new FileNotFoundException($"Could not find {addinName}.xml as embedded resource or file");
+                }
+            }
 
             BuildRibbonPanels(application, addinXml, addinAssembly);
             ExecuteStartupScript(application, addinXml, addinAssembly);
@@ -196,13 +216,28 @@ namespace RpsRuntime
         /// then null is returned.
         /// </summary>
         private string GetEmbeddedScript(string scriptName, Assembly addinAssembly)
-        {         
+        {
             if (scriptName == null)
             {
                 return null;
             }
-            var source = new StreamReader(addinAssembly.GetManifestResourceStream(scriptName)).ReadToEnd();
-            return source;
+
+            // Try embedded resource first
+            var resourceStream = addinAssembly.GetManifestResourceStream(scriptName);
+            if (resourceStream != null)
+            {
+                return new StreamReader(resourceStream).ReadToEnd();
+            }
+
+            // Fall back to file in assembly directory
+            var assemblyDir = Path.GetDirectoryName(addinAssembly.Location);
+            var scriptPath = Path.Combine(assemblyDir, scriptName);
+            if (File.Exists(scriptPath))
+            {
+                return File.ReadAllText(scriptPath);
+            }
+
+            return null;
         }
 
         private string GetStartupScriptName(XDocument addinXml)

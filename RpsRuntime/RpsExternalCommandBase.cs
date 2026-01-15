@@ -16,17 +16,43 @@ namespace RpsRuntime
         /// <summary>
         /// Find the script in the resources and run it.
         /// </summary>
+        private string _scriptName;
+
+        protected RpsExternalCommandBase(string scriptName)
+        {
+            _scriptName = scriptName;
+        }
+
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
             var executor = new ScriptExecutor(GetConfig(), commandData, message, elements);
 
-            var className = this.GetType().Name;            // e.g. "ec_helloworld"
-            var scriptName = className.Substring(3) + ".py"; // e.g. "helloworld.py
             var assembly = this.GetType().Assembly;
+            string source;
 
-            var source = new StreamReader(assembly.GetManifestResourceStream(scriptName)).ReadToEnd();
+            // Try to load from embedded resource first
+            var resourceStream = assembly.GetManifestResourceStream(_scriptName);
+            if (resourceStream != null)
+            {
+                source = new StreamReader(resourceStream).ReadToEnd();
+            }
+            else
+            {
+                // Fall back to file in assembly directory
+                var assemblyDir = Path.GetDirectoryName(assembly.Location);
+                var scriptPath = Path.Combine(assemblyDir, _scriptName);
+                if (File.Exists(scriptPath))
+                {
+                    source = File.ReadAllText(scriptPath);
+                }
+                else
+                {
+                    message = $"Could not find script '{_scriptName}' as embedded resource or file";
+                    return Result.Failed;
+                }
+            }
 
-            var result = executor.ExecuteScript(source, Path.Combine(assembly.Location, scriptName));
+            var result = executor.ExecuteScript(source, Path.Combine(assembly.Location, _scriptName));
             message = executor.Message;
             switch (result)
             {

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Configurations>Debug;Release</Configurations>
 		<RuntimeIdentifiers>win</RuntimeIdentifiers>
@@ -264,6 +264,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="none" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="IronPython">

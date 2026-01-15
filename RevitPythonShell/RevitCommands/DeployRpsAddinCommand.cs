@@ -5,10 +5,14 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Resources;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using RpsRuntime;
 
 namespace RevitPythonShell.RevitCommands
@@ -49,10 +53,27 @@ namespace RevitPythonShell.RevitCommands
 
                 var ironPythonPath = Path.GetDirectoryName(this.GetType().Assembly.Location);
                 CopyFile(Path.Combine(ironPythonPath, "IronPython.dll"));                    // IronPython.dll
-                CopyFile(Path.Combine(ironPythonPath, "IronPython.Modules.dll"));            // IronPython.Modules.dll            
+                CopyFile(Path.Combine(ironPythonPath, "IronPython.Modules.dll"));            // IronPython.Modules.dll
                 CopyFile(Path.Combine(ironPythonPath, "Microsoft.Scripting.dll"));           // Microsoft.Scripting.dll
                 CopyFile(Path.Combine(ironPythonPath, "Microsoft.Scripting.Metadata.dll"));  // Microsoft.Scripting.Metadata.dll
                 CopyFile(Path.Combine(ironPythonPath, "Microsoft.Dynamic.dll"));             // Microsoft.Dynamic.dll
+
+                // Copy Roslyn assemblies if they exist (needed for the compiled assembly)
+                var roslynAssemblies = new[] {
+                    "Microsoft.CodeAnalysis.dll",
+                    "Microsoft.CodeAnalysis.CSharp.dll",
+                    "System.Collections.Immutable.dll",
+                    "System.Reflection.Metadata.dll"
+                };
+
+                foreach (var roslynAssembly in roslynAssemblies)
+                {
+                    var roslynPath = Path.Combine(ironPythonPath, roslynAssembly);
+                    if (File.Exists(roslynPath))
+                    {
+                        CopyFile(roslynPath);
+                    }
+                }
 
                 // copy files mentioned (they must all be unique)
                 CopyIcons();
@@ -182,18 +203,11 @@ namespace RevitPythonShell.RevitCommands
 
         private void CreateAssembly()
         {
-            var assemblyName = new AssemblyName { Name = _addinName + ".dll", Version = new Version(1, 0, 0, 0) };
-
-#if !NET8_0
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave, _outputFolder);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("RpsAddinModule", _addinName + ".dll");
-#else
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("RpsAddinModule");
-            var resourceFilePath = Path.Combine(_outputFolder, $"{_addinName}.resources");
-#endif
-
-#if !NET8_0
+            // Generate C# source code for the addin
+            var sourceCode = GenerateAddinSourceCode();
+            
+            // Get all Python scripts to embed as resources
+            var scriptResources = new Dictionary<string, string>();
             foreach (var xmlPushButton in _doc.Descendants("PushButton"))
             {
                 string scriptFileName = xmlPushButton.Attribute("src")?.Value ?? xmlPushButton.Attribute("script")?.Value;
@@ -203,37 +217,182 @@ namespace RevitPythonShell.RevitCommands
                 }
 
                 var scriptFile = GetRootedPath(_rootFolder, scriptFileName);
-                var newScriptFile = Path.GetFileName(scriptFile);
-                using (var scriptStream = File.OpenRead(scriptFile))
+                if (!File.Exists(scriptFile))
                 {
-                    moduleBuilder.DefineManifestResource(newScriptFile, scriptStream, ResourceAttributes.Public);
+                    throw new FileNotFoundException("Could not find script file", scriptFile);
                 }
+
+                var newScriptFile = Path.GetFileName(scriptFile);
+                scriptResources[newScriptFile] = File.ReadAllText(scriptFile);
+                
+                // Update XML to point to the new filename
                 xmlPushButton.Attribute("src").Value = newScriptFile;
             }
-#else
-            using (var resWriter = new ResourceWriter(resourceFilePath))
+            
+            // Add RpsAddin xml as resource
+            var xmlContent = _doc.ToString();
+            
+            // Compile with Roslyn and save to disk
+            CompileWithRoslyn(sourceCode, scriptResources, xmlContent);
+        }
+
+        private string GenerateAddinSourceCode()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("using System;");
+            sb.AppendLine("using Autodesk.Revit.Attributes;");
+            sb.AppendLine("using Autodesk.Revit.DB;");
+            sb.AppendLine("using Autodesk.Revit.UI;");
+            sb.AppendLine("using RpsRuntime;");
+            sb.AppendLine();
+
+            // Generate the main application class (no namespace - Revit looks for class by simple name)
+            sb.AppendLine($"[Transaction(TransactionMode.Manual)]");
+            sb.AppendLine($"[Regeneration(RegenerationOption.Manual)]");
+            sb.AppendLine($"public class {_addinName} : RpsExternalApplicationBase");
+            sb.AppendLine("{");
+            sb.AppendLine("    // The base class handles everything automatically");
+            sb.AppendLine("}");
+            sb.AppendLine();
+
+            // Generate IExternalCommand classes for each PushButton (no namespace)
+            foreach (var xmlPushButton in _doc.Descendants("PushButton"))
             {
-                foreach (var xmlPushButton in _doc.Descendants("PushButton"))
+                string scriptFileName = xmlPushButton.Attribute("src")?.Value ?? xmlPushButton.Attribute("script")?.Value;
+                if (scriptFileName != null)
                 {
-                    string scriptFileName = xmlPushButton.Attribute("src")?.Value ?? xmlPushButton.Attribute("script")?.Value;
-                    if (scriptFileName == null)
-                    {
-                        throw new ApplicationException("<PushButton/> tag missing a src attribute in addin manifest");
-                    }
+                    var scriptName = Path.GetFileNameWithoutExtension(scriptFileName);
+                    var className = "ec_" + scriptName;
 
-                    var scriptFile = GetRootedPath(_rootFolder, scriptFileName);
-                    var newScriptFile = Path.GetFileName(scriptFile);
-                    using (var scriptStream = File.OpenRead(scriptFile))
-                    {
-                        resWriter.AddResource(newScriptFile, scriptStream);
-                    }
-                    xmlPushButton.Attribute("src").Value = newScriptFile;
+                    sb.AppendLine($"[Transaction(TransactionMode.Manual)]");
+                    sb.AppendLine($"[Regeneration(RegenerationOption.Manual)]");
+                    sb.AppendLine($"public class {className} : RpsExternalCommandBase");
+                    sb.AppendLine("{");
+                    sb.AppendLine($"    public {className}() : base(\"{scriptFileName}\") {{ }}");
+                    sb.AppendLine("}");
+                    sb.AppendLine();
                 }
-                resWriter.Generate();
             }
-#endif
 
-            AddExternalApplicationToAssembly(_addinName, moduleBuilder);
+            return sb.ToString();
+        }
+
+        private void CompileWithRoslyn(string sourceCode, Dictionary<string, string> scriptResources, string xmlContent)
+        {
+            // Parse the source code
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
+
+            // Get reference assemblies
+            var references = new List<MetadataReference>
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Autodesk.Revit.Attributes.TransactionAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Autodesk.Revit.UI.IExternalCommand).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Autodesk.Revit.DB.Document).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(RpsRuntime.RpsExternalApplicationBase).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly.Location),
+            };
+
+            // Add System.Runtime and other core references
+            var systemRuntimeAssembly = Assembly.Load("System.Runtime");
+            if (systemRuntimeAssembly != null)
+            {
+                references.Add(MetadataReference.CreateFromFile(systemRuntimeAssembly.Location));
+            }
+
+            // Add netstandard if available (needed for .NET Framework compatibility)
+            try
+            {
+                var netstandardAssembly = Assembly.Load("netstandard");
+                if (netstandardAssembly != null)
+                {
+                    references.Add(MetadataReference.CreateFromFile(netstandardAssembly.Location));
+                }
+            }
+            catch
+            {
+                // netstandard not available, continue without it
+            }
+
+            // Add IronPython references
+            var ironPythonPath = Path.GetDirectoryName(typeof(Microsoft.Scripting.Hosting.ScriptEngine).Assembly.Location);
+            if (Directory.Exists(ironPythonPath))
+            {
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(ironPythonPath, "IronPython.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(ironPythonPath, "IronPython.Modules.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(ironPythonPath, "Microsoft.Dynamic.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(ironPythonPath, "Microsoft.Scripting.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(ironPythonPath, "Microsoft.Scripting.Metadata.dll")));
+            }
+
+            // Prepare embedded resources
+            // Store byte arrays to avoid closure issues with lambdas
+            var resourceData = new Dictionary<string, byte[]>();
+
+            // Add XML manifest
+            var xmlResourceName = $"{_addinName}.xml";
+            resourceData[xmlResourceName] = Encoding.UTF8.GetBytes(xmlContent);
+
+            // Add Python scripts
+            foreach (var script in scriptResources)
+            {
+                resourceData[script.Key] = Encoding.UTF8.GetBytes(script.Value);
+            }
+
+            // Create ResourceDescription list with proper lambda closures
+            var manifestResources = new List<ResourceDescription>();
+            foreach (var kvp in resourceData)
+            {
+                var name = kvp.Key;
+                var data = kvp.Key;
+                manifestResources.Add(new ResourceDescription(
+                    name,
+                    () => new MemoryStream(resourceData[data]),
+                    isPublic: true
+                ));
+            }
+
+            // Create compilation
+            var compilation = CSharpCompilation.Create(
+                $"{_addinName}.dll",
+                syntaxTrees: new[] { syntaxTree },
+                references: references,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
+
+            // Create output stream for the DLL
+            var outputPath = Path.Combine(_outputFolder, $"{_addinName}.dll");
+
+            // Emit the compilation WITHOUT resources first (Roslyn's ResourceDescription doesn't work reliably)
+            using (var dllStream = File.Create(outputPath))
+            {
+                var emitResult = compilation.Emit(peStream: dllStream);
+
+                if (!emitResult.Success)
+                {
+                    // Handle compilation errors
+                    var errors = new StringBuilder();
+                    errors.AppendLine("Compilation failed:");
+                    foreach (var diagnostic in emitResult.Diagnostics)
+                    {
+                        if (diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
+                        {
+                            errors.AppendLine(diagnostic.ToString());
+                        }
+                    }
+                    throw new ApplicationException(errors.ToString());
+                }
+            }
+
+            // Save resources as separate files since Roslyn embedding doesn't work
+            // The RpsRuntime code will need to be modified to load from files instead
+            foreach (var kvp in resourceData)
+            {
+                var resourcePath = Path.Combine(_outputFolder, kvp.Key);
+                File.WriteAllBytes(resourcePath, kvp.Value);
+            }
         }
 
 

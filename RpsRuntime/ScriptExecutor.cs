@@ -97,7 +97,7 @@ namespace RpsRuntime
                 try
                 {
                     script.Execute(scope);
-
+                    outputStream.Flush();
                     _message = (scope.GetVariable("__message__") ?? "").ToString();
                     return (int)(scope.GetVariable("__result__") ?? Result.Succeeded);
                 }

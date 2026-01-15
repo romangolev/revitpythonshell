@@ -19,9 +19,9 @@ namespace RpsRuntime
     {
         private readonly ScriptOutput _gui;
         private readonly ScriptEngine _engine;
-        private int _bomCharsLeft; // we want to get rid of pesky UTF8-BOM-Chars on write
         private readonly Queue<MemoryStream> _completedLines; // one memorystream per line of input
         private MemoryStream _inputBuffer;
+        private readonly StringBuilder _outputBuffer; // Buffer for output text
 
         public ScriptOutputStream(ScriptOutput gui, ScriptEngine engine)
         {
@@ -36,8 +36,7 @@ namespace RpsRuntime
 
             _completedLines = new Queue<MemoryStream>();
             _inputBuffer = new MemoryStream();
-
-            _bomCharsLeft = 3; //0xef, 0xbb, 0xbf for UTF-8 (see http://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding)
+            _outputBuffer = new StringBuilder();
         }
 
         void ClosedEventHandler(object sender, EventArgs e)
@@ -126,36 +125,58 @@ namespace RpsRuntime
         /// </summary>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            lock (this)
+            if (_gui.IsDisposed || count <= 0)
             {
-                if (_gui.IsDisposed)
-                {
-                    return;
-                }
-
-                while (_bomCharsLeft > 0 && count > 0)
-                {
-                    _bomCharsLeft--;
-                    count--;
-                    offset++;
-                }
-
-                var actualBuffer = new byte[count];
-                Array.Copy(buffer, offset, actualBuffer, 0, count);
-                var text = Encoding.UTF8.GetString(actualBuffer);
-                Debug.WriteLine(text);
-                _gui.BeginInvoke((Action)delegate()
-                {
-                    _gui.txtStdOut.AppendText(text);
-                    _gui.txtStdOut.SelectionStart = _gui.txtStdOut.Text.Length;
-                    _gui.txtStdOut.ScrollToCaret();
-                });
-                Application.DoEvents();
+                return;
             }
+
+            var actualBuffer = new byte[count];
+            Array.Copy(buffer, offset, actualBuffer, 0, count);
+            // IronPython writes UTF-16LE, not UTF-8
+            var text = Encoding.Unicode.GetString(actualBuffer);
+
+            // Buffer the text
+            _outputBuffer.Append(text);
+
+            // Update UI if we have a newline or buffer is getting large
+            if (text.Contains("\n") || _outputBuffer.Length > 1000)
+            {
+                FlushToUI();
+            }
+        }
+
+        private void FlushToUI()
+        {
+            if (_gui.IsDisposed || _outputBuffer.Length == 0) return;
+
+            var text = _outputBuffer.ToString();
+            _outputBuffer.Clear();
+
+            if (_gui.InvokeRequired)
+            {
+                _gui.Invoke((Action)delegate()
+                {
+                    UpdateTextBox(text);
+                });
+            }
+            else
+            {
+                UpdateTextBox(text);
+            }
+        }
+
+        private void UpdateTextBox(string text)
+        {
+            if (_gui.IsDisposed) return;
+
+            _gui.txtStdOut.AppendText(text);
+            _gui.txtStdOut.SelectionStart = _gui.txtStdOut.Text.Length;
+            _gui.txtStdOut.ScrollToCaret();
         }
 
         public override void Flush()
         {
+            FlushToUI();
         }
 
         public override long Seek(long offset, SeekOrigin origin)
