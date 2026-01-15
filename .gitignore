@@ -113,3 +113,6 @@ docs/_build/
 
 # Visual Studio 2015 cache/options directory
 .vs/
+
+# claude
+.claude/

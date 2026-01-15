@@ -1,4 +1,7 @@
 # Changelog
+- 2026-01-15 **2.3.0**
+  - Use Roslyn to build dlls for "Deploy RpsAddin", fixes issue [#167](https://github.com/architecture-building-systems/revitpythonshell/issues/167)
+  - Introduce Dark theme for Revit 2024+
 - 2025-04-03 **2.2.0**
   - Support Autodesk Revit version 2026.
 - 2025-04-03 **2.1.0**

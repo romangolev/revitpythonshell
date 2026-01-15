@@ -120,8 +120,8 @@ This project is licensed under the terms of the [MIT License](http://opensource.
 * [Chuong Mep](https://github.com/chuongmep/) a people like maintain for project open source.
 * [Roman Golev](https://github.com/romangolev/) (port to Revit 2025)
 * [Jean-Marc Couffin](https://github.com/jmcouffin/) (port to Revit 2026)
+* [Roman Golev](https://github.com/romangolev/) modernize dll build process by using Roslyn, Dark theme for Revit 2024+
 * many, many users with questions, bug reports etc!
-
 Also, many thanks to the
 [Chair for Architecture & Building Systems](http://systems.arch.ethz.ch) for making this project possible.
 
