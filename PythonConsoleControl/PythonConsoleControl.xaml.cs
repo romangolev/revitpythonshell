@@ -16,8 +16,8 @@ namespace PythonConsoleControl
     /// </summary>
     public partial class IronPythonConsoleControl : UserControl
     {
-        private const string LightHighlightingName = "Python Console Highlighting v4";
-        private const string DarkHighlightingName = "Python Console Dark Highlighting v4";
+        private const string LightHighlightingName = "Python Console Highlighting";
+        private const string DarkHighlightingName = "Python Console Dark Highlighting";
         private const string LightHighlightingResource = "PythonConsoleControl.Resources.Python.xshd";
         private const string DarkHighlightingResource = "PythonConsoleControl.Resources.Python-Dark.xshd";
 

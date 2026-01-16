@@ -342,17 +342,11 @@ namespace RevitPythonShell.RevitCommands
             }
 
             // Create ResourceDescription list with proper lambda closures
-            var manifestResources = new List<ResourceDescription>();
-            foreach (var kvp in resourceData)
-            {
-                var name = kvp.Key;
-                var data = kvp.Key;
-                manifestResources.Add(new ResourceDescription(
-                    name,
-                    () => new MemoryStream(resourceData[data]),
-                    isPublic: true
-                ));
-            }
+            var manifestResources = resourceData.Select(kvp => new ResourceDescription(
+                kvp.Key,
+                () => new MemoryStream(kvp.Value),
+                isPublic: true
+            )).ToList();
 
             // Create compilation
             var compilation = CSharpCompilation.Create(

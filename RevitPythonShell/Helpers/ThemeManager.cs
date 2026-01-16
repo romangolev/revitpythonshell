@@ -141,22 +141,14 @@ namespace RevitPythonShell.Helpers
 
         public void ApplyThemeToWindow(Window window)
         {
-            ResourceDictionary themeDictionary;
-            
-            if (CurrentTheme == Theme.Dark)
+            var themeDictionary = new ResourceDictionary
             {
-                themeDictionary = new ResourceDictionary
-                {
-                    Source = new Uri("/RevitPythonShell;component/Themes/DarkTheme.xaml", UriKind.Relative)
-                };
-            }
-            else
-            {
-                themeDictionary = new ResourceDictionary
-                {
-                    Source = new Uri("/RevitPythonShell;component/Themes/LightTheme.xaml", UriKind.Relative)
-                };
-            }
+                Source = new Uri(
+                    CurrentTheme == Theme.Dark
+                        ? "/RevitPythonShell;component/Themes/DarkTheme.xaml"
+                        : "/RevitPythonShell;component/Themes/LightTheme.xaml",
+                    UriKind.Relative)
+            };
 
             window.Resources.MergedDictionaries.Clear();
             window.Resources.MergedDictionaries.Add(themeDictionary);
@@ -169,8 +161,8 @@ namespace RevitPythonShell.Helpers
                 : "RevitPythonShell.Resources.Python.xshd";
 
             string highlightingName = CurrentTheme == Theme.Dark
-                ? "Python-Dark Highlighting v4"
-                : "Python Highlighting v4";
+                ? "Python-Dark Highlighting"
+                : "Python Highlighting";
 
             IHighlightingDefinition existingHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
             if (existingHighlighting != null)

@@ -25,9 +25,8 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-                <!-- <ResourceDictionary Source="/RevitPythonShell;component/Themes/DarkTheme.xaml" /> -->
-
-                <ResourceDictionary Source="/RevitPythonShell;component/Themes/LightTheme.xaml" />
+                <ResourceDictionary Source="/RevitPythonShell;component/Themes/DarkTheme.xaml" />
+                <!-- <ResourceDictionary Source="/RevitPythonShell;component/Themes/LightTheme.xaml" /> -->
 			</ResourceDictionary.MergedDictionaries>
 
 			<Style TargetType="{x:Type Ribbon}">
@@ -186,25 +185,25 @@
 					<RibbonApplicationMenu Visibility="Collapsed">
 					</RibbonApplicationMenu>
 				</Ribbon.ApplicationMenu>
-				<RibbonTab Header="Home" ContextMenu="{x:Null}">
-					<RibbonGroup Header="File">
+				<RibbonTab Header="Home" ContextMenu="{x:Null}" Height="90">
+					<RibbonGroup Header="File" Height="82">
 						<RibbonButton Label="New" LargeImageSource="../Resources/Theme/New.png"
                                       ToolTip="New (Ctrl + N)"
                                       SnapsToDevicePixels="True"
-                                     Click="newFileClick" />
+                                     Click="newFileClick" Margin="0,0,0,-11" />
 						<RibbonButton Label="Open" LargeImageSource="../Resources/Theme/Open.png"
                                       ToolTip="Open (Ctrl + O)"
-                                      Click="openFileClick" />
+                                      Click="openFileClick" Margin="0,0,0,-11" />
 						<RibbonButton Label="Save" LargeImageSource="../Resources/Theme/Save.png"
                                       ToolTip="Save (Ctrl + S)"
                                       Click="saveFileClick"
-                                      SnapsToDevicePixels="True" />
+                                      SnapsToDevicePixels="True" Margin="0,0,0,-11" />
 						<RibbonButton Label="Save As" LargeImageSource="../Resources/Theme/SaveAs.png"
                                       ToolTip="Save As (Ctrl + Shift + S)"
                                       SnapsToDevicePixels="True"
-                                      Click="saveAsFileClick" />
+                                      Click="saveAsFileClick" Margin="0,0,0,-11" Width="46" />
 					</RibbonGroup>
-					<RibbonGroup Header="Modify">
+					<RibbonGroup Header="Modify" Height="82">
 						<RibbonButton Label="Cut" SmallImageSource="../Resources/Theme/Cut.png"
                                       ToolTip="Cut Selected"
                                       SnapsToDevicePixels="True"
@@ -218,7 +217,7 @@
                                       SnapsToDevicePixels="True"
                                       Command="Paste" />
 					</RibbonGroup>
-					<RibbonGroup Header="Edit">
+					<RibbonGroup Header="Edit" Height="82">
 						<RibbonToggleButton Label="Undo"
                                             SmallImageSource="../Resources/Theme/Undo.png"
                                             SnapsToDevicePixels="True"
@@ -233,7 +232,7 @@
                                       SnapsToDevicePixels="True"
                                       Command="Delete" />
 					</RibbonGroup>
-					<RibbonGroup Header="Cell">
+					<RibbonGroup Header="Cell" Height="82">
 						<RibbonCheckBox Label="WordWrap" SmallImageSource="../Resources/Theme/WordWrap.png"
                                         ToolTip="Toggle Word Wrap"
                                         SnapsToDevicePixels="True"
@@ -248,7 +247,7 @@
                                         ToolTip="Toggle Line Numbers"
                                         SnapsToDevicePixels="True"/>
 					</RibbonGroup>
-					<RibbonGroup Header="Execute">
+					<RibbonGroup Header="Execute" Height="82">
 						<RibbonButton Label="Run" LargeImageSource="../Resources/Theme/Run.png"
                                       SnapsToDevicePixels="True"
                                       Click="runClick"
@@ -256,16 +255,6 @@
 					</RibbonGroup>
 				</RibbonTab>
 			</Ribbon>
-			<!-- <ToolBar DockPanel.Dock="Top"> -->
-			<!--     <Separator /> -->
-			<!--     <CheckBox IsChecked="{Binding ElementName=textEditor, Path=ShowLineNumbers}"> -->
-			<!--         <Image -->
-			<!--             Height="16" -->
-			<!--             SnapsToDevicePixels="True" -->
-			<!--             Source="/RevitPythonShell;component/Resources/Theme/Number.png" -->
-			<!--             ToolTip="Toggle Line Numbers" /> -->
-			<!--     </CheckBox> -->
-			<!-- </ToolBar> -->
 		</DockPanel>
 		<Grid Grid.Column="0" Grid.Row="2" Background="{DynamicResource ThemeEditorBackground}">
 			<avalonEdit:TextEditor
@@ -304,7 +293,5 @@
 				<Button Grid.Column="4" x:Name="closeButton" Style="{StaticResource TitleBarCloseButtonStyle}" Click="CloseButton_Click" Content="&#xE8BB;" />
 			</Grid>
 		</Border>
-
-
 	</Grid>
 </Window>

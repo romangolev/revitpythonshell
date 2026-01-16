@@ -42,23 +42,25 @@ namespace RpsRuntime
 
             // Try to load XML from embedded resource first, then from file
             XDocument addinXml;
-            var xmlResourceStream = addinAssembly.GetManifestResourceStream(addinName + ".xml");
-            if (xmlResourceStream != null)
+            using (var xmlResourceStream = addinAssembly.GetManifestResourceStream(addinName + ".xml"))
             {
-                addinXml = XDocument.Load(xmlResourceStream);
-            }
-            else
-            {
-                // Fall back to loading from file in same directory as assembly
-                var assemblyDir = Path.GetDirectoryName(addinAssembly.Location);
-                var xmlPath = Path.Combine(assemblyDir, addinName + ".xml");
-                if (File.Exists(xmlPath))
+                if (xmlResourceStream != null)
                 {
-                    addinXml = XDocument.Load(xmlPath);
+                    addinXml = XDocument.Load(xmlResourceStream);
                 }
                 else
                 {
-                    throw new FileNotFoundException($"Could not find {addinName}.xml as embedded resource or file");
+                    // Fall back to loading from file in same directory as assembly
+                    var assemblyDir = Path.GetDirectoryName(addinAssembly.Location);
+                    var xmlPath = Path.Combine(assemblyDir, addinName + ".xml");
+                    if (File.Exists(xmlPath))
+                    {
+                        addinXml = XDocument.Load(xmlPath);
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException($"Could not find {addinName}.xml as embedded resource or file");
+                    }
                 }
             }
 
@@ -118,7 +120,10 @@ namespace RpsRuntime
             if (IsValidPath(xmlPushButton.Attribute("largeImage")))
             {
                 var largeImagePath = GetAbsolutePath(xmlPushButton.Attribute("largeImage").Value);
-                result.LargeImage = BitmapDecoder.Create(File.OpenRead(largeImagePath), BitmapCreateOptions.None, BitmapCacheOption.None).Frames[0];
+                using (var stream = File.OpenRead(largeImagePath))
+                {
+                    result.LargeImage = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.None).Frames[0];
+                }
             }
             else
             {
@@ -128,7 +133,10 @@ namespace RpsRuntime
             if (IsValidPath(xmlPushButton.Attribute("smallImage")))
             {
                 var smallImagePath = GetAbsolutePath(xmlPushButton.Attribute("smallImage").Value);
-                result.Image = BitmapDecoder.Create(File.OpenRead(smallImagePath), BitmapCreateOptions.None, BitmapCacheOption.None).Frames[0];
+                using (var stream = File.OpenRead(smallImagePath))
+                {
+                    result.Image = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.None).Frames[0];
+                }
             }
             else
             {
@@ -179,9 +187,11 @@ namespace RpsRuntime
         private ImageSource GetEmbeddedPng(string imageName)
         {
             var assembly = typeof(RpsExternalApplicationBase).Assembly;
-            var file = assembly.GetManifestResourceStream(imageName);
-            var source = PngBitmapDecoder.Create(file, BitmapCreateOptions.None, BitmapCacheOption.None);
-            return source.Frames[0];
+            using (var file = assembly.GetManifestResourceStream(imageName))
+            {
+                var source = PngBitmapDecoder.Create(file, BitmapCreateOptions.None, BitmapCacheOption.None);
+                return source.Frames[0];
+            }
         }
 
         /// <summary>
@@ -223,10 +233,15 @@ namespace RpsRuntime
             }
 
             // Try embedded resource first
-            var resourceStream = addinAssembly.GetManifestResourceStream(scriptName);
-            if (resourceStream != null)
+            using (var resourceStream = addinAssembly.GetManifestResourceStream(scriptName))
             {
-                return new StreamReader(resourceStream).ReadToEnd();
+                if (resourceStream != null)
+                {
+                    using (var reader = new StreamReader(resourceStream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
             }
 
             // Fall back to file in assembly directory

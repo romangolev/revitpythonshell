@@ -16,7 +16,7 @@ namespace RpsRuntime
         /// <summary>
         /// Find the script in the resources and run it.
         /// </summary>
-        private string _scriptName;
+        private readonly string _scriptName;
 
         protected RpsExternalCommandBase(string scriptName)
         {
@@ -31,24 +31,29 @@ namespace RpsRuntime
             string source;
 
             // Try to load from embedded resource first
-            var resourceStream = assembly.GetManifestResourceStream(_scriptName);
-            if (resourceStream != null)
+            using (var resourceStream = assembly.GetManifestResourceStream(_scriptName))
             {
-                source = new StreamReader(resourceStream).ReadToEnd();
-            }
-            else
-            {
-                // Fall back to file in assembly directory
-                var assemblyDir = Path.GetDirectoryName(assembly.Location);
-                var scriptPath = Path.Combine(assemblyDir, _scriptName);
-                if (File.Exists(scriptPath))
+                if (resourceStream != null)
                 {
-                    source = File.ReadAllText(scriptPath);
+                    using (var reader = new StreamReader(resourceStream))
+                    {
+                        source = reader.ReadToEnd();
+                    }
                 }
                 else
                 {
-                    message = $"Could not find script '{_scriptName}' as embedded resource or file";
-                    return Result.Failed;
+                    // Fall back to file in assembly directory
+                    var assemblyDir = Path.GetDirectoryName(assembly.Location);
+                    var scriptPath = Path.Combine(assemblyDir, _scriptName);
+                    if (File.Exists(scriptPath))
+                    {
+                        source = File.ReadAllText(scriptPath);
+                    }
+                    else
+                    {
+                        message = $"Could not find script '{_scriptName}' as embedded resource or file";
+                        return Result.Failed;
+                    }
                 }
             }
 

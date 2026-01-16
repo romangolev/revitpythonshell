@@ -132,8 +132,7 @@ namespace RpsRuntime
 
             var actualBuffer = new byte[count];
             Array.Copy(buffer, offset, actualBuffer, 0, count);
-            // IronPython writes UTF-16LE, not UTF-8
-            var text = Encoding.Unicode.GetString(actualBuffer);
+            var text = Encoding.UTF8.GetString(actualBuffer);
 
             // Buffer the text
             _outputBuffer.Append(text);

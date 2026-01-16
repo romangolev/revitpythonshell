@@ -103,7 +103,6 @@ namespace RevitPythonShell.Views
         }
  
         private void textEditor_PreviewKeyDown(object sender, KeyEventArgs e)
- 
         {
             if (e.Key == Key.F5) RunStatements();
             if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control) SaveFile();
@@ -201,7 +200,6 @@ namespace RevitPythonShell.Views
         }
  
         // Clear the contents on first click inside the editor
-
         private void textEditor_GotFocus(object sender, RoutedEventArgs e)
         {
             if (this.currentFileName == null)
